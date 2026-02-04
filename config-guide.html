@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenClaw完整配置指南，涵盖环境变量、插件配置、模型设置等所有配置选项">
+    <meta name="keywords" content="OpenClaw, 配置, 环境变量, 插件, 模型, 教程">
+    <title>配置指南 - 玩转OpenClaw</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>玩转OpenClaw</h1>
+            <p>最全面的OpenClaw部署、配置和使用指南</p>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="ubuntu-deployment.html">部署指南</a></li>
+                    <li><a href="config-guide.html" class="active">配置指南</a></li>
+                    <li><a href="index.html#troubleshooting">故障排除</a></li>
+                    <li><a href="index.html#about">关于</a></li>
+                </ul>
+            </nav>
+            <button id="mobile-menu-toggle" aria-label="切换菜单">☰</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="tutorial-content">
+            <h1>OpenClaw 配置指南</h1>
+            
+            <p>本指南详细介绍 OpenClaw 的所有配置选项，帮助你根据需求定制功能。</p>
+            
+            <h2>环境变量配置</h2>
+            <p>OpenClaw 主要通过环境变量进行配置。以下是主要的配置项：</p>
+            
+            <h3>基础配置</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>环境变量</th>
+                        <th>默认值</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>CLAWDBOT_WORKSPACE</code></td>
+                        <td><code>/home/user/clawd</code></td>
+                        <td>工作目录路径</td>
+                    </tr>
+                    <tr>
+                        <td><code>CLAWDBOT_PORT</code></td>
+                        <td><code>18789</code></td>
+                        <td>服务监听端口</td>
+                    </tr>
+                    <tr>
+                        <td><code>CLAWDBOT_LOG_LEVEL</code></td>
+                        <td><code>info</code></td>
+                        <td>日志级别 (silent/fatal/error/warn/info/debug/trace)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>模型配置</h3>
+            <p>根据你使用的模型提供商，配置相应的 API Key：</p>
+            
+            <h4>阿里云通义千问</h4>
+            <pre><code>ALIBABA_CLOUD_API_KEY=your-api-key-here
+# 国际版
+ALIBABA_CLOUD_INTERNATIONAL_API_KEY=your-international-api-key
+# 美国版  
+ALIBABA_CLOUD_US_API_KEY=your-us-api-key</code></pre>
+
+            <h4>OpenAI</h4>
+            <pre><code>OPENAI_API_KEY=your-openai-api-key
+OPENAI_ORGANIZATION=your-organization-id</code></pre>
+
+            <h4>Anthropic Claude</h4>
+            <pre><code>ANTHROPIC_API_KEY=your-anthropic-api-key</code></pre>
+
+            <h2>插件配置</h2>
+            <p>OpenClaw 支持多种插件，用于不同的消息渠道和功能扩展。</p>
+            
+            <h3>消息渠道插件</h3>
+            <h4>Telegram</h4>
+            <pre><code>TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_DM_POLICY=pairing</code></pre>
+
+            <h4>WhatsApp</h4>
+            <pre><code>WHATSAPP_PHONE_NUMBER=your-phone-number
+WHATSAPP_DM_POLICY=pairing</code></pre>
+
+            <h4>Discord</h4>
+            <pre><code>DISCORD_BOT_TOKEN=your-discord-bot-token</code></pre>
+
+            <h3>Web搜索插件</h3>
+            <pre><code># Brave Search
+BRAVE_API_KEY=your-brave-api-key
+
+# Perplexity
+PERPLEXITY_API_KEY=your-perplexity-api-key</code></pre>
+
+            <h2>高级配置</h2>
+            
+            <h3>浏览器控制</h3>
+            <pre><code>CLAWDBOT_BROWSER_ENABLED=true
+CLAWDBOT_BROWSER_HEADLESS=false
+CLAWDBOT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium-browser</code></pre>
+
+            <h3>内存和会话</h3>
+            <pre><code>CLAWDBOT_AGENTS_DEFAULTS_MEMORY_SEARCH_ENABLED=true
+CLAWDBOT_SESSION_IDLE_MINUTES=1440</code></pre>
+
+            <h3>安全配置</h3>
+            <pre><code>CLAWDBOT_GATEWAY_AUTH_MODE=token
+CLAWDBOT_GATEWAY_AUTH_TOKEN=your-secure-token-here</code></pre>
+
+            <h2>配置文件方式</h2>
+            <p>除了环境变量，你也可以使用 JSON 配置文件 <code>moltbot.json</code>：</p>
+            
+            <pre><code>{
+  "gateway": {
+    "port": 18789,
+    "auth": {
+      "mode": "token",
+      "token": "your-secure-token"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/home/user/clawd",
+      "model": {
+        "primary": "alibaba-cloud/qwen3-max-2026-01-23"
+      }
+    }
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "enabled": true,
+        "provider": "brave",
+        "apiKey": "your-brave-api-key"
+      }
+    }
+  }
+}</code></pre>
+
+            <h2>配置优先级</h2>
+            <p>配置的优先级顺序（从高到低）：</p>
+            <ol>
+                <li>命令行参数</li>
+                <li>环境变量</li>
+                <li>JSON 配置文件</li>
+                <li>内置默认值</li>
+            </ol>
+
+            <h2>动态配置</h2>
+            <p>OpenClaw 支持运行时动态配置：</p>
+            <pre><code># 在聊天中使用 /config 命令（需要启用）
+/config set gateway.port 18790
+
+# 或者通过 HTTP API
+curl -X POST http://localhost:18789/api/config \
+  -H "Content-Type: application/json" \
+  -d '{"gateway": {"port": 18790}}'</code></pre>
+
+            <h2>最佳实践</h2>
+            <ul>
+                <li><strong>敏感信息保护</strong>：API Key 等敏感信息不要硬编码在代码中</li>
+                <li><strong>环境分离</strong>：开发、测试、生产环境使用不同的配置</li>
+                <li><strong>版本控制</strong>：将配置文件纳入版本控制，但排除敏感信息</li>
+                <li><strong>定期备份</strong>：定期备份重要配置和数据</li>
+            </ul>
+
+            <h2>故障排除</h2>
+            <p>如果配置不生效，请检查：</p>
+            <ul>
+                <li>环境变量是否正确设置</li>
+                <li>配置文件语法是否正确</li>
+                <li>服务是否已重启加载新配置</li>
+                <li>日志中是否有相关错误信息</li>
+            </ul>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 玩转OpenClaw. 本项目基于MIT许可证开源.</p>
+            <p>国内访问：<a href="https://yourname.gitee.io/openclaw-guide" target="_blank">Gitee Pages</a> | 
+               国际访问：<a href="https://yourname.github.io/openclaw-guide" target="_blank">GitHub Pages</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

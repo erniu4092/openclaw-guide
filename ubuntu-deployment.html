@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ubuntu 22.04 完整部署OpenClaw指南，包含系统要求、依赖安装、Docker配置等详细步骤">
+    <meta name="keywords" content="OpenClaw, Ubuntu, 部署, Docker, Linux, 教程">
+    <title>Ubuntu 22.04 完整部署指南 - 玩转OpenClaw</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>玩转OpenClaw</h1>
+            <p>最全面的OpenClaw部署、配置和使用指南</p>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="ubuntu-deployment.html" class="active">部署指南</a></li>
+                    <li><a href="config-guide.html">配置指南</a></li>
+                    <li><a href="index.html#troubleshooting">故障排除</a></li>
+                    <li><a href="index.html#about">关于</a></li>
+                </ul>
+            </nav>
+            <button id="mobile-menu-toggle" aria-label="切换菜单">☰</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="tutorial-content">
+            <h1>Ubuntu 22.04 完整部署指南</h1>
+            
+            <p>本指南将带你从零开始在 Ubuntu 22.04 系统上完整部署 OpenClaw。整个过程大约需要 15-30 分钟，取决于你的网络速度。</p>
+            
+            <h2>系统要求</h2>
+            <ul>
+                <li><strong>操作系统</strong>: Ubuntu 22.04 LTS (推荐)</li>
+                <li><strong>CPU</strong>: 2核以上</li>
+                <li><strong>内存</strong>: 4GB 以上</li>
+                <li><strong>存储</strong>: 20GB 可用空间</li>
+                <li><strong>网络</strong>: 稳定的互联网连接</li>
+            </ul>
+
+            <h2>准备工作</h2>
+            <h3>1. 更新系统</h3>
+            <p>首先确保系统是最新的：</p>
+            <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+
+            <h3>2. 安装必要依赖</h3>
+            <p>安装 Git、curl 和其他基础工具：</p>
+            <pre><code>sudo apt install -y git curl wget unzip build-essential</code></pre>
+
+            <h2>安装 Docker</h2>
+            <p>OpenClaw 依赖 Docker 运行，我们需要先安装 Docker 和 Docker Compose。</p>
+            
+            <h3>1. 安装 Docker</h3>
+            <pre><code># 添加 Docker 官方 GPG 密钥
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# 添加 Docker 仓库
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 安装 Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io</code></pre>
+
+            <h3>2. 安装 Docker Compose</h3>
+            <pre><code># 下载 Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 设置执行权限
+sudo chmod +x /usr/local/bin/docker-compose
+
+# 创建符号链接
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose</code></pre>
+
+            <h3>3. 验证安装</h3>
+            <pre><code># 验证 Docker
+docker --version
+
+# 验证 Docker Compose  
+docker-compose --version
+
+# 将当前用户添加到 docker 组（避免每次使用 sudo）
+sudo usermod -aG docker $USER
+# 注意：需要重新登录才能生效</code></pre>
+
+            <h2>部署 OpenClaw</h2>
+            <h3>1. 克隆 OpenClaw 仓库</h3>
+            <pre><code>git clone https://github.com/moltbot/openclaw.git
+cd openclaw</code></pre>
+
+            <h3>2. 配置环境变量</h3>
+            <p>复制示例环境文件并进行编辑：</p>
+            <pre><code>cp .env.example .env
+nano .env</code></pre>
+            
+            <p>在 .env 文件中，至少需要配置以下变量：</p>
+            <pre><code># 基础配置
+CLAWDBOT_WORKSPACE=/home/your-username/clawd
+CLAWDBOT_PORT=18789
+
+# 模型配置（以阿里云为例）
+ALIBABA_CLOUD_API_KEY=your-api-key-here
+
+# 其他可选配置
+CLAWDBOT_LOG_LEVEL=info
+CLAWDBOT_BROWSER_ENABLED=true</code></pre>
+
+            <h3>3. 启动服务</h3>
+            <pre><code># 使用 Docker Compose 启动
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f</code></pre>
+
+            <h2>验证部署</h2>
+            <p>部署完成后，你可以通过以下方式验证：</p>
+            
+            <h3>1. 访问 Web 界面</h3>
+            <p>打开浏览器，访问 <code>http://your-server-ip:18789</code></p>
+            
+            <h3>2. 测试 API</h3>
+            <pre><code>curl http://localhost:18789/health</code></pre>
+            
+            <h3>3. 检查容器状态</h3>
+            <pre><code>docker ps | grep openclaw</code></pre>
+
+            <h2>常见问题</h2>
+            <h3>端口被占用</h3>
+            <p>如果 18789 端口被占用，可以在 .env 文件中修改 <code>CLAWDBOT_PORT</code> 变量。</p>
+            
+            <h3>权限问题</h3>
+            <p>如果遇到权限问题，确保当前用户已添加到 docker 组，并且工作目录有写入权限。</p>
+            
+            <h3>网络问题</h3>
+            <p>如果 Docker 镜像拉取失败，可以尝试配置 Docker 镜像加速器。</p>
+
+            <h2>下一步</h2>
+            <p>成功部署后，建议继续阅读 <a href="config-guide.html">配置指南</a> 来了解如何自定义 OpenClaw 的各种功能。</p>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 玩转OpenClaw. 本项目基于MIT许可证开源.</p>
+            <p>国内访问：<a href="https://gitee.com/bug--brother/openclaw-guide" target="_blank">Gitee Pages</a> | 
+               国际访问：<a href="https://github.com/erniu4092/-openclaw-guide" target="_blank">GitHub Pages</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
